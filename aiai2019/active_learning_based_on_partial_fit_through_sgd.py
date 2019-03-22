@@ -1,25 +1,17 @@
 # -*- coding: utf-8 -*-
-
 from __future__ import division
 import libact
 import os
 import copy
+import numpy as np
+
 import sys
 sys.path.append(r'/home/user/anaconda2/lib/python2.7/site-packages')
 
-import numpy as np
-import matplotlib.pyplot as plt
-try:
-	from sklearn.model_selection import train_test_split
-except ImportError:
-	from sklearn.cross_validation import train_test_split
 import xlwt
 
-from sklearn.utils import shuffle
-from sklearn.preprocessing import normalize
-from sklearn.datasets import load_iris
+from sklearn import shuffle
 from sklearn.model_selection import StratifiedShuffleSplit
-from sklearn.cross_validation import cross_val_score
 from sklearn.linear_model import SGDClassifier as SGD
 from sklearn.naive_bayes import MultinomialNB as MNB
 from sklearn.naive_bayes import BernoulliNB as BNB
@@ -27,20 +19,14 @@ from numpy.testing import assert_array_equal
 
 #from libact.models import SklearnAdapter, SklearnProbaAdapter
 from libact.base.interfaces import Model, ContinuousModel, ProbabilisticModel
-from libact.utils import inherit_docstring_from, zip
 from libact.models import *
 from libact.query_strategies import *
 from libact.labelers import IdealLabeler
 from libact.base.dataset import Dataset
 from libact.utils import inherit_docstring_from, seed_random_state, zip
 from libact.base.interfaces import QueryStrategy
-from libact.query_strategies import ActiveLearningByLearning
 
 from pandas import read_csv
-from decimal import *
-getcontext().prec = 4
-
-import timeit
 from datetime import datetime
 
 import warnings
@@ -55,7 +41,6 @@ l_csv = [x for x in os.listdir('.') ]
 test_size = 0.10
 times_l = []
 print l_csv
-
 
 def run(trn_ds, tst_ds, lbr, model, qs, quota, j):
 	
@@ -162,7 +147,7 @@ def main():
 			  counter_jj = -1
 			  count = count + 1
 			  my_clf =  lea
-			  print str(my_clf)[0: str(my_clf).find('(')] + '(' + str(my_clf)[str(my_clf).find('loss') : str(my_clf).find(',', str(my_clf).find('loss'))] + ')' + ' ,(' + str(my_clf)[str(my_clf).find('penalty') : str(my_clf).find(',', str(my_clf).find('penalty'))] + ')'
+			  print str(my_clf)[0: str(my_clf).find('(')] + '(' + str(my_clf)[str(my_clf).find('loss') : str(my_clf).find(',', str(my_clf).find('loss'))] + ' , '  + str(my_clf)[str(my_clf).find('penalty') : str(my_clf).find(',', str(my_clf).find('penalty'))] + ')'
 
 			  for j in myspace:
 
@@ -197,9 +182,7 @@ def main():
 							qs1 = RandomSampling (trn_ds, model =  SklearnProbaAdapter(my_clf))
 							model = SklearnProbaAdapter(my_clf)
 							E_out_1, ttt , trn_ds_returned , aa , bb = run(trn_ds, tst_ds, lbr, model, qs1, quota, j)
-							
-						#print '#(L+U) = ' , len(trn_ds_returned) , ' instances per iter = ', aa, ' initial_amount = ', bb , ' #L = ', trn_ds_returned.len_labeled(), ' #U = ', trn_ds_returned.len_unlabeled()
-						
+													
 						if count != 0:
 						  down_cells = len(E_out_1) + 9
 						else:
@@ -214,7 +197,7 @@ def main():
 						sheet1.write(i - 3, counter_jj + counter_j, trn_ds_returned.len_labeled())       # amount of training data after active learning procedure
 						sheet1.write(i - 2, counter_jj + counter_j, trn_ds_returned.len_unlabeled())     # amount of unlabeled instances after active learning procedure
 						
-						sheet1.write(i-8, counter_jj + counter_j, str(my_clf)[0: str(my_clf).find('(')] + '(' + str(my_clf)[str(my_clf).find('loss') : str(my_clf).find(',', str(my_clf).find('loss'))] + ')' + ' ,(' + str(my_clf)[str(my_clf).find('penalty') : str(my_clf).find(',', str(my_clf).find('penalty'))] + ')')
+						sheet1.write(i-8, counter_jj + counter_j, str(my_clf)[0: str(my_clf).find('(')] + '(' + str(my_clf)[str(my_clf).find('loss') : str(my_clf).find(',', str(my_clf).find('loss'))] + ' , ' + str(my_clf)[str(my_clf).find('penalty') : str(my_clf).find(',', str(my_clf).find('penalty'))] + ')')
 						for n in E_out_1:
 
 							sheet1.write(i, counter_jj + counter_j, n)
@@ -229,7 +212,6 @@ def main():
 	
 if __name__ == '__main__':
 	
-	getcontext().prec = 4
 	main()
 	print(l_csv)
 	print(times_l)
