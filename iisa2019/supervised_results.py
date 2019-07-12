@@ -36,7 +36,7 @@ warnings.filterwarnings("ignore")
 
 def download1(decide):
     
-    os.chdir('C:\Users\stamatisk\Google Drive\sinergasies for phd\iisa2019')
+    os.chdir('give your pathe with the datasets here')
     
     if decide == 1:
         data = pd.read_csv('voice_numeric.csv')
@@ -59,7 +59,7 @@ def download1(decide):
     print ('given dataset: ', X.shape, y.shape)
     return (X, y)
 
-decide = 1
+decide = 3
 (X, y) = download1(decide) # DATAFRAME , SERIES
 
 if decide == 1:
