@@ -3,44 +3,33 @@ import time
 import pickle
 import numpy as np
 import pandas as pd
+
 import matplotlib.pyplot as plt
 import matplotlib.mlab as mlab
+
 from scipy import stats
-from pylab import rcParams
 from sklearn.utils import check_random_state
-from sklearn.datasets import load_digits
-from sklearn.datasets import fetch_mldata
-from sklearn.decomposition import PCA
 from sklearn.preprocessing import scale
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.cluster import KMeans
-from sklearn.mixture import GaussianMixture
-from sklearn.svm import LinearSVC, SVC
-from sklearn.linear_model import LinearRegression
-from sklearn.linear_model import LogisticRegression
+
 from sklearn import metrics
-from sklearn.metrics import pairwise_distances_argmin_min
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import precision_recall_curve
 from sklearn.metrics import average_precision_score
 from sklearn.model_selection import cross_val_score
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import precision_recall_fscore_support
+from sklearn.model_selection import cross_val_score
+
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.ensemble import GradientBoostingClassifier as GraB 
 from sklearn.naive_bayes import GaussianNB as NB
-from sklearn.linear_model import SGDClassifier as SGD
 from sklearn.neighbors import KNeighborsClassifier as KNN
-from sklearn.gaussian_process import GaussianProcessClassifier as GPcl
 from sklearn.ensemble import ExtraTreesClassifier as EXT
 from sklearn.neural_network import MLPClassifier as MLP
-from sklearn.metrics import precision_recall_fscore_support
-
 
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.utils import shuffle
-from sklearn.model_selection import cross_val_score
 import os
-
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -105,7 +94,6 @@ class RfModel(BaseModel):
     model_type = 'Random Forest'
     
     def fit_predict(self, X_train, y_train, X_val, X_test, c_weight):
-        #print ('training random forest...')
         self.classifier = RandomForestClassifier(n_estimators=100, class_weight=c_weight, random_state = 23)
         self.classifier.fit(X_train, y_train)
         self.test_y_predicted = self.classifier.predict(X_test)
@@ -384,8 +372,6 @@ class TheAlgorithm(object):
             y_val = np.delete(y_val, uncertain_samples_ssl, axis=0)
             print 
 
-                      
-
             self.queried += (self.initial_labeled_samples * self.ssl_ratio)
             (X_train, X_val, X_test) = self.clf_model.train(X_train, y_train, X_val, X_test, 'balanced')
             self.clf_model.get_test_accuracy(active_iteration, y_test, 'Semi-supervised Learning')
@@ -444,21 +430,27 @@ def experiment(d, models, selection_functions, Ks, repeats, contfrom, L0, select
 
 
 #%%
-for LR in [0.01, 0.05]: 
-    ssl_ration = [3, 4]
-    query_pools = [160, 200]
+for LR in [0.01, 0.05]: 	 # selected learning ratios
+    ssl_ration = [3, 4] 	 # selected denominators for al_ssl_ratio
+    query_pools = [160, 200] #selected B values
     
     (X, y) = download_dataset(1)
     X = X.iloc[:,1:]
     
     dataset_size = X.shape[0]
     testset_size = 0.1 * dataset_size
+    
     repeats = 3
+
     (X_train_full, y_train_full, X_test, y_test) = split_alssl(X, y, repeats, testset_size / dataset_size)
+    
     print ('L + U:', X_train_full[0].shape, y_train_full[0].shape)
     print ('test :', X_test[0].shape, y_test[0].shape)
+    
     classes = len(np.unique(y))
+    
     print ('unique classes', classes)
+    
     trainset_size = X_train_full[0].shape[0]
     L0 = int(trainset_size * LR)    
         
@@ -493,4 +485,3 @@ for LR in [0.01, 0.05]:
         with open('al_ssl_nameofdataset_LR_' + str(LR) + '_ratio_1_' + str(ssl_ratio) + '_' + str(max_queried) + '_insta.pickle', 'wb') as f:
              pickle.dump(d,f)
         del d, mytest
-    
